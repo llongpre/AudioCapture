@@ -1,8 +1,34 @@
 //Lets require/import the HTTP module
 var http = require('http');
 var fs = require('fs');
-var audiorecorder = require('audio-recorder');
-var recordrtc = require('recordrtc');
+var express = require('express');
+var bodyParser = require('body-parser');
+var fileUpload = require('express-fileupload');
+
+
+var app = express();
+app.use('/', express.static(__dirname + '/public'));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(fileUpload());
+
+// on client
+// add reference to jquery
+ 
+
+app.post('/download-audio', function (req, res) {
+	console.log(req.files)
+	var file = req.files.file;
+	file.mv(__dirname+"/test.wav",function(err){
+		if (err){
+			console.log(err);
+		}
+		else {
+			console.log("success");
+		}
+	});
+	//fs.writeFileSync("test.wav",req.body);
+})
 
 //Lets define a port we want to listen to
 var PORT=8080; 
@@ -14,10 +40,12 @@ function handleRequest(request, response){
 }
 
 //Create a server
-var server = http.createServer(handleRequest);
+var server = http.createServer(app);
 
 //Lets start our server
 server.listen(PORT, function(){
     //Callback triggered when server is successfully listening. Hurray!
     console.log("Server listening on: http://localhost:%s", PORT);
 });
+
+
